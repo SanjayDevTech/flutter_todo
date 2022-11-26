@@ -66,8 +66,10 @@ class HomeTodoList extends StatefulWidget {
 
 class _HomeTodoListState extends State<HomeTodoList> {
   List<Todo> _todosList = [];
+  int _nextIndex = 0;
 
   Future<List<Todo>> getTodos() async {
+    await Future.delayed(const Duration(seconds: 4));
     var jsonString = await rootBundle.loadString('assets/data/todos.json');
     var json =
         (jsonDecode(jsonString) as List).map((e) => Todo.fromJson(e)).toList();
@@ -103,6 +105,7 @@ class _HomeTodoListState extends State<HomeTodoList> {
       (value) => {
         setState(() {
           _todosList = value;
+          _nextIndex = _todosList.length + 1;
         })
       },
     );
@@ -110,22 +113,95 @@ class _HomeTodoListState extends State<HomeTodoList> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: _todosList.length,
-      itemBuilder: (context, index) {
-        var todo = _todosList[index];
-        return TodoItem(
-          key: ValueKey(todo.id),
-          todo: _todosList[index],
-          onRemove: () {
-            removeTodo(todo.id);
-          },
-          onComplete: () {
-            completeTodo(todo.id);
-          },
-        );
-      },
+    return Column(
+      children: [
+        Flexible(
+          child: ListView.builder(
+            key: const ValueKey("ListViewKey"),
+            itemCount: _todosList.length,
+            itemBuilder: (context, index) {
+              var todo = _todosList[index];
+              return TodoItem(
+                key: ValueKey(todo.id),
+                todo: _todosList[index],
+                onRemove: () {
+                  removeTodo(todo.id);
+                },
+                onComplete: () {
+                  completeTodo(todo.id);
+                },
+              );
+            },
+          ),
+        ),
+        Flexible(
+          flex: 0,
+          child: ElevatedButton(
+            onPressed: () {
+              late PersistentBottomSheetController controller;
+              controller = Scaffold.of(context).showBottomSheet((context) {
+                return TodoAddBottomSheet(
+                  onAdd: (title, description) {
+                    controller.close();
+                    setState(() {
+                      _todosList.add(Todo(
+                          id: _nextIndex,
+                          title: title,
+                          description: description,
+                          completed: false));
+                          
+                      _nextIndex++;
+                    });
+                  },
+                );
+              });
+            },
+            child: const Text("Add Todo"),
+          ),
+        ),
+      ],
     );
+  }
+}
+
+class TodoAddBottomSheet extends StatelessWidget {
+  TodoAddBottomSheet({super.key, required this.onAdd});
+
+  final void Function(String, String) onAdd;
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+      children: [
+          TextFormField(
+            controller: _titleController,
+            decoration: const InputDecoration(
+              labelText: "Title",
+            ),
+          ),
+          TextFormField(
+            controller: _descriptionController,
+            decoration: const InputDecoration(
+              labelText: "Description",
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              onAdd(
+                _titleController.text,
+                _descriptionController.text,
+              );
+            },
+            child: const Text("Add"),
+          ),
+      ],
+    ),
+        ));
   }
 }
 
