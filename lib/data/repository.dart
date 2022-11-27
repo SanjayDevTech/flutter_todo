@@ -1,36 +1,30 @@
 import 'dart:async';
 
-import 'data_provider.dart';
+import 'package:flutter_todo/data/local/entities.dart';
+
+import 'local/dao.dart';
+import 'convertor.dart';
 import 'models.dart';
 
 class Repository {
-  final DataProvider _dataProvider;
-  final StreamController<List<Todo>> _todosStreamController =
-      StreamController();
+  late TodoDao _todoDao;
 
-  Repository(this._dataProvider) {
-     fetchTodos();
-  }
+  Repository(this._todoDao);
 
-  Stream<List<Todo>> get todosStream => _todosStreamController.stream;
-
-  Future<void> fetchTodos() async {
-    var todos = await _dataProvider.getTodos();
-    _todosStreamController.add(todos);
+  Stream<List<Todo>> fetchTodos() {
+    return _todoDao.getAllTodos().map((event) => event.map((e) => e.model).toList());
   }
 
   Future<void> addTodo(Todo todo) async {
-    await _dataProvider.addTodo(todo);
-    await fetchTodos();
+    return await _todoDao.insertTodo(todo.entity);
   }
 
-  Future<void> removeTodoById(String id) async {
-    await _dataProvider.removeTodo(id);
-    await fetchTodos();
+  Future<void> removeTodoById(Todo todo) async {
+    return await _todoDao.deleteTodo(todo.entity);
   }
 
-  Future<void> completeTodoById(String id) async {
-    await _dataProvider.completeTodo(id);
-    await fetchTodos();
+  Future<void> completeTodoById(Todo todo) async {
+    final updatedTodo = todo.copyWith(completed: !todo.completed);
+    return await _todoDao.updateTodo(updatedTodo.entity);
   }
 }

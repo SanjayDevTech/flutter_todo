@@ -11,7 +11,9 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Home Page"),
       ),
-      body: SafeArea(child: HomeBlocConsumer()),
+      body: const SafeArea(
+        child: HomeBlocConsumer(),
+      ),
     );
   }
 }

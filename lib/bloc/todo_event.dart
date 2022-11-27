@@ -17,19 +17,19 @@ class TodoAdd extends TodoEvent {
 }
 
 class TodoRemove extends TodoEvent {
-  final String id;
+  final Todo todo;
 
-  const TodoRemove(this.id);
+  const TodoRemove(this.todo);
 
   @override
-  List<Object> get props => [id];
+  List<Object> get props => [todo];
 }
 
 class TodoComplete extends TodoEvent {
-  final String id;
+  final Todo todo;
 
-  const TodoComplete(this.id);
+  const TodoComplete(this.todo);
 
   @override
-  List<Object> get props => [id];
+  List<Object> get props => [todo];
 }

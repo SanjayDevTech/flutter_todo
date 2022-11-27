@@ -1,42 +1,65 @@
 import 'package:flutter/material.dart';
 
 class TodoAddBottomSheet extends StatelessWidget {
-  TodoAddBottomSheet({super.key});
+  const TodoAddBottomSheet({super.key, required this.titleController, required this.descriptionController});
 
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-
+  final TextEditingController titleController;
+  final TextEditingController descriptionController;
+  
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          const Text("Add todo", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
-          TextFormField(
-            controller: _titleController,
-            decoration: const InputDecoration(
-              labelText: "Title",
+    return AnimatedPadding(
+      padding: MediaQuery.of(context).viewInsets,
+      // padding: const EdgeInsets.all(16.0),
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.decelerate,
+      child: Container(
+        height: 300,
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                "Add todo",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              ),
             ),
-          ),
-          TextFormField(
-            controller: _descriptionController,
-            decoration: const InputDecoration(
-              labelText: "Description",
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                autofocus: true,
+                controller: titleController,
+                decoration: const InputDecoration(
+                  labelText: "Title",
+                  hintText: 'Enter title',
+                  border: OutlineInputBorder(),
+                ),
+              ),
             ),
-          ),
-          const Spacer(),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context, {"title": _titleController.text, "description": _descriptionController.text});
-              },
-              child: const Text("Add"),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                controller: descriptionController,
+                decoration: const InputDecoration(
+                  labelText: "Description",
+                  hintText: 'Enter description',
+                  border: OutlineInputBorder(),
+                ),
+              ),
             ),
-          ),
-        ],
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context, true);
+                },
+                child: const Text("Add"),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

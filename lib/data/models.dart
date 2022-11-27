@@ -13,6 +13,15 @@ class Todo extends Equatable {
     required this.completed,
   });
 
+  Todo copyWith({String? title, String? description, bool? completed}) {
+    return Todo(
+      id: id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      completed: completed ?? this.completed,
+    );
+  }
+
   @override
   List<Object?> get props => [id, title, description, completed];
 

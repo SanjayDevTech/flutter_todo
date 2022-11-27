@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo/data/local/data_inherited.dart';
 import 'package:flutter_todo/data/models.dart';
+import 'package:flutter_todo/data/repository.dart';
 import 'bottom_sheet.dart';
 import 'todo_item.dart';
 
@@ -13,13 +15,14 @@ class HomeData extends StatelessWidget {
       required this.nextId});
 
   final List<Todo> todos;
-  final Function(String) removeTodo;
-  final Function(String) completeTodo;
+  final Function(Todo) removeTodo;
+  final Function(Todo) completeTodo;
   final Function(Todo) addTodo;
   final String Function() nextId;
 
   @override
   Widget build(BuildContext context) {
+    final repository = Repository(DataInherited.of(context).todoDao);
     return Column(
       children: [
         Flexible(
@@ -36,10 +39,10 @@ class HomeData extends StatelessWidget {
                       key: ValueKey(todo.id),
                       todo: todo,
                       onRemove: () {
-                        removeTodo(todo.id);
+                        removeTodo(todo);
                       },
                       onComplete: () {
-                        completeTodo(todo.id);
+                        completeTodo(todo);
                       },
                     );
                   },
@@ -49,18 +52,26 @@ class HomeData extends StatelessWidget {
           flex: 0,
           child: ElevatedButton(
             onPressed: () async {
-              var data = await showModalBottomSheet<Map<String, String>>(
+              final titleTextController = TextEditingController();
+              final descriptionTextController = TextEditingController();
+              var data = await showModalBottomSheet<bool>(
+                isScrollControlled: true,
                 context: context,
-                builder: (_) => TodoAddBottomSheet(),
+                builder: (_) {
+                  return TodoAddBottomSheet(
+                    titleController: titleTextController,
+                    descriptionController: descriptionTextController,
+                  );
+                },
               );
-              if (data != null) {
+              if (data == true) {
                 var todo = Todo(
                   id: nextId(),
-                  title: data["title"]!,
-                  description: data["description"]!,
+                  title: titleTextController.text,
+                  description: descriptionTextController.text,
                   completed: false,
                 );
-                addTodo(todo);
+                repository.addTodo(todo);
               }
             },
             child: const Text("Add Todo"),
