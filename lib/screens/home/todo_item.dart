@@ -24,6 +24,7 @@ class TodoItem extends StatelessWidget {
       title: Text(todo.title, style: textStyle),
       subtitle: Text(todo.description, style: textStyle),
       leading: Checkbox(
+        activeColor: Colors.green,
         value: todo.completed,
         onChanged: (value) {
           onComplete();
